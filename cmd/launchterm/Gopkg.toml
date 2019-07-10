@@ -1,0 +1,11 @@
+[[constraint]]
+  branch = "master"
+  name = "github.com/AllenDang/w32"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/sys"
+
+[prune]
+  go-tests = true
+  unused-packages = true
