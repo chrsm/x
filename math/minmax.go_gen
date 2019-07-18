@@ -1,0 +1,22 @@
+package math
+
+import "github.com/cheekybits/genny/generic"
+
+type ValueType generic.Type
+type FnName generic.Type
+
+func MaxFnName(a, b ValueType) ValueType {
+	if a > b {
+		return a
+	}
+
+	return b
+}
+
+func MinFnName(a, b ValueType) ValueType {
+	if a < b {
+		return a
+	}
+
+	return b
+}

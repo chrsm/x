@@ -1,0 +1,30 @@
+package math
+
+import (
+	"testing"
+
+	"github.com/cheekybits/genny/generic"
+)
+
+type FnName generic.Type
+type ValueType generic.Type
+
+func TestFnName(t *testing.T) {
+	var a, b ValueType = 0, 1
+
+	if MaxFnName(a, b) != 1 {
+		t.Error("Max fail")
+	}
+
+	if MaxFnName(b, a) != 1 {
+		t.Error("Max fail")
+	}
+
+	if MinFnName(a, b) != 0 {
+		t.Error("Min fail")
+	}
+
+	if MinFnName(b, a) != 0 {
+		t.Error("Min fail")
+	}
+}
