@@ -1,0 +1,64 @@
+package stringconv
+
+import (
+	"strings"
+	"strconv"
+
+	"github.com/cheekybits/genny/generic"
+)
+
+type FnName generic.Type
+type ValueType generic.Type
+type Bits generic.Type
+
+// ToFnName converts a string to a ValueType
+// Use only when you don't care if the input is valid, as the error is thrown away.
+// No efforts are made to handle overflow.
+func ToFnName(src string) ValueType {
+	num, _ := strconv.ParseInt(src, 10, Bits)
+
+	return ValueType(num)
+}
+
+// ToFnName_FAST doesn't use the stdlib to convert numbers.
+// It's "safe" if you don't expect negative integers, but really only
+// saves 10-20 ns.
+func ToFnName_FAST(src string) ValueType {
+	var n ValueType
+
+	for i := 0; i < len(src); i++ {
+		n = n*10 + ValueType(src[i] - '0')
+	}
+
+	return n
+}
+
+// CsvToFnName converts a string to []ValueType, zero vals included.
+func CsvToFnName(src string) []ValueType {
+	if len(src) == 0 {
+		return nil
+	}
+
+	split := strings.Split(src, ",")
+	r := make([]ValueType, len(split))
+
+	for i := 0; i < len(split); i++ {
+		r[i] = ToFnName(split[i])
+	}
+
+	return r
+}
+
+// StrsToFnName converts a []string to []ValueType.
+func StrsToFnName(src []string) []ValueType {
+	if len(src) == 0 {
+		return nil
+	}
+
+	r := make([]ValueType, len(src))
+	for i := range src {
+		r[i] = ToFnName(src[i])
+	}
+
+	return r
+}

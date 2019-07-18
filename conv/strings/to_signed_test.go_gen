@@ -1,0 +1,129 @@
+package stringconv
+
+import (
+	"testing"
+	"math"
+	"math/rand"
+
+	"github.com/cheekybits/genny/generic"
+)
+
+type FnName generic.Type
+type ValueType generic.Type
+
+var maxUValueType = ^uValueType(0)
+var maxValueType = ValueType(maxUValueType >> 1)
+var minValueType = -(maxValueType - 1)
+
+func TestFnName(t *testing.T) {
+	numstr := "100"
+
+	n := ToFnName(numstr)
+	if n != 100 {
+		t.Error("Failed to get 100 from ToFnName")
+	}
+
+	// we don't _really_ care if the string doesn't actually represent
+	// a number. in that case, we just want a 0 back.
+	invalid := "-_-f-ado039230_;lol_no<generics>"
+	n = ToFnName(invalid)
+	if n != 0 {
+		t.Errorf("Got %d from ToFnName, expected 0", n)
+	}
+}
+
+func TestCsvToFnName(t *testing.T) {
+	csvstr := fmt.Sprintf("%d,1,2,3,%d", minValueType, maxValueType)
+
+	nslc := CsvToFnName(csvstr)
+	if nslc[0] != minValueType || nslc[1] != 1 || nslc[2] != 2 || nslc[3] != 3 || nslc[4] != maxValueType {
+		t.Errorf("Failed to decode %s: got %v", csvstr, nslc)
+	}
+
+	invalid := "a,b,cDEf,4,5,6;7;8" // we'll expect some zeroes
+	nslc = CsvToFnName(invalid)
+	if nslc[0] != 0 || nslc[1] != 0 || nslc[2] != 0 || nslc[3] != 4 || nslc[4] != 5 || nslc[5] != 0 {
+		t.Errorf("Failed to decode %s: got %v", invalid, nslc)
+	}
+}
+
+func TestStrsToFnName(t *testing.T) {
+	rstrs := _randBFnName()
+	strs := _toStrsFnName(rstrs)
+
+	nslc := StrsToFnName(strs)
+
+	for i := range nslc {
+		if nslc[i] != rstrs[i] {
+			t.Errorf("Expected nslc[%d] = randoms[%d]; got %v / %v", i, i, nslc[i], rstrs[i])
+		}
+	}
+
+	t.Logf("%v == %v", strs, nslc)
+}
+
+
+func _randFnName() ValueType {
+	m := math.Abs(math.Min(math.Pow(2, 32), math.Pow(2, Bits)))
+
+	return ValueType(rand.Intn(int(m)))
+}
+
+func _randBFnName() []ValueType {
+	r := make([]ValueType, 10)
+
+	for i := 0; i < len(r); i++ {
+		r[i] = _randFnName()
+	}
+
+	return r
+}
+
+func _toStrsFnName(src []ValueType) []string {
+	strs := make([]string, len(src))
+	for i := range src {
+		strs[i] = fmt.Sprintf("%d", src[i])
+	}
+
+	return strs
+}
+
+var FnName_FAST ValueType
+
+func BenchmarkFast_FnName(b *testing.B) {
+	var num ValueType
+	// generate some random numbers
+	x := make([]string, 1000)
+	for i := 0; i < 1000; i++ {
+		x[i] = fmt.Sprintf("%d", _randFnName())
+	}
+
+	b.ResetTimer()
+	b.ReportAllocs()
+
+	for n := 0; n < b.N; n++ {
+		num = ToFnName_FAST(x[n*int(1000/b.N)])
+	}
+
+	FnName_FAST = num
+}
+
+var FnName_STD ValueType
+
+func BenchmarkStdAtoi_FnName(b *testing.B) {
+	var num ValueType
+	// generate some random numbers
+	x := make([]string, 1000)
+	for i := 0; i < 1000; i++ {
+		x[i] = fmt.Sprintf("%d", _randFnName())
+	}
+
+	b.ResetTimer()
+	b.ReportAllocs()
+
+	for n := 0; n < b.N; n++ {
+		num = ToFnName(x[n*int(1000/b.N)])
+	}
+
+	FnName_STD = num
+}
