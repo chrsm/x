@@ -1,0 +1,18 @@
+package indexof
+
+import (
+	"github.com/cheekybits/genny/generic"
+)
+
+type FnName generic.Type
+type ValueType generic.Type
+
+func FnName(v ValueType, src []ValueType) int {
+	for i := range src {
+		if src[i] == v {
+			return i
+		}
+	}
+
+	return -1
+}
