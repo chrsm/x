@@ -1,0 +1,8 @@
+test-fixture:
+  id: 1
+  attribute: 2
+
+test-fixture2:
+  id: 2
+  attribute: 3
+  another: 4
